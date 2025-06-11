@@ -1,0 +1,62 @@
+{# templates/budget/transaction_form.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }} - {{ parent() }}{% endblock %}
+
+{% block body %}
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>{{ title }}</h4>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form) }}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form_row(form.title) }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form_row(form.amount) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form_row(form.type) }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form_row(form.category) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form_row(form.date) }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        {{ form_row(form.description) }}
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ path('budget_dashboard') }}" class="btn btn-secondary me-md-2">
+                            Annuler
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            {{ transaction is defined ? 'Modifier' : 'Ajouter' }}
+                        </button>
+                    </div>
+                    {{ form_end(form) }}
+
+                    {% if transaction is defined %}
+                        <hr>
+                        <form method="post" action="{{ path('budget_transaction_delete', {id: transaction.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette transaction ?');">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Supprimer
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

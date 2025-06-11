@@ -1,0 +1,89 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Budget{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Revenus</h5>
+                    <p class="card-text h3">{{ totalIncome|number_format(2, ',', ' ') }} €</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Dépenses</h5>
+                    <p class="card-text h3">{{ totalExpense|number_format(2, ',', ' ') }} €</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card {% if balance >= 0 %}bg-primary{% else %}bg-warning{% endif %} text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Solde</h5>
+                    <p class="card-text h3">{{ balance|number_format(2, ',', ' ') }} €</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">Transactions du mois</h2>
+            <div>
+                <a href="{{ path('app_transactions_index') }}" class="btn btn-info me-2">Voir toutes les transactions</a>
+                <a href="{{ path('app_transaction_new') }}" class="btn btn-primary">Nouvelle transaction</a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Titre</th>
+                            <th>Catégorie</th>
+                            <th>Type</th>
+                            <th>Montant</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for transaction in transactions %}
+                        <tr>
+                            <td>{{ transaction.date|date('d/m/Y') }}</td>
+                            <td>{{ transaction.title }}</td>
+                            <td>
+                                {% if transaction.category %}
+                                    <span class="badge" style="background-color: {{ transaction.category.color }}">
+                                        {{ transaction.category.name }}
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if transaction.type == 'income' %}
+                                    <span class="badge bg-success">Revenu</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Dépense</span>
+                                {% endif %}
+                            </td>
+                            <td class="{% if transaction.type == 'income' %}text-success{% else %}text-danger{% endif %}">
+                                {% if transaction.type == 'income' %}+{% else %}-{% endif %}
+                                {{ transaction.amount|number_format(2, ',', ' ') }} €
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center">Aucune transaction trouvée</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

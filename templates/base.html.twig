@@ -1,0 +1,49 @@
+{# templates/base.html.twig #}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Gestion de Budget{% endblock %}</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>💰</text></svg>">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    {% block stylesheets %}{% endblock %}
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="{{ path('budget_dashboard') }}">
+            <i class="fas fa-wallet"></i> Budget Manager
+        </a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="{{ path('budget_dashboard') }}">
+                <i class="fas fa-chart-pie"></i> Tableau de bord
+            </a>
+            <a class="nav-link" href="{{ path('budget_transactions') }}">
+                <i class="fas fa-list"></i> Transactions
+            </a>
+            <a class="nav-link" href="{{ path('budget_transaction_new') }}">
+                <i class="fas fa-plus"></i> Nouvelle Transaction
+            </a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    {% for type, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ type == 'error' ? 'danger' : type }} alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    {% block body %}{% endblock %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% block javascripts %}{% endblock %}
+</body>
+</html>

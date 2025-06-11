@@ -1,0 +1,158 @@
+{# templates/budget/dashboard.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord - {{ parent() }}{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">Tableau de bord - {{ current_month }}</h1>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-success">
+                <div class="card-header">
+                    <i class="fas fa-arrow-up"></i> Revenus du mois
+                </div>
+                <div class="card-body">
+                    <h4>{{ monthly_income|number_format(2, ',', ' ') }} €</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-danger">
+                <div class="card-header">
+                    <i class="fas fa-arrow-down"></i> Dépenses du mois
+                </div>
+                <div class="card-body">
+                    <h4>{{ monthly_expenses|number_format(2, ',', ' ') }} €</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white {{ balance >= 0 ? 'bg-info' : 'bg-warning' }}">
+                <div class="card-header">
+                    <i class="fas fa-balance-scale"></i> Solde
+                </div>
+                <div class="card-body">
+                    <h4>{{ balance|number_format(2, ',', ' ') }} €</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-clock"></i> Transactions récentes</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_transactions %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Titre</th>
+                                    <th>Catégorie</th>
+                                    <th>Montant</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for transaction in recent_transactions %}
+                                    <tr>
+                                        <td>{{ transaction.date|date('d/m/Y') }}</td>
+                                        <td>{{ transaction.title }}</td>
+                                        <td>
+                                            {% if transaction.category %}
+                                                <span class="badge" style="background-color: {{ transaction.category.color }}">
+                                                    {{ transaction.category.name }}
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Sans catégorie</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{{ path('budget_transaction_edit', {id: transaction.id}) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="{{ path('budget_transactions') }}" class="btn btn-primary">
+                                Voir toutes les transactions
+                            </a>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Aucune transaction enregistrée</p>
+                        <a href="{{ path('budget_transaction_new') }}" class="btn btn-primary">
+                            Ajouter votre première transaction
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-pie"></i> Dépenses par catégorie</h5>
+                </div>
+                <div class="card-body">
+                    {% if expenses_by_category %}
+                        <canvas id="expensesChart" width="300" height="300"></canvas>
+                    {% else %}
+                        <p class="text-muted">Aucune dépense pour ce mois</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if expenses_by_category %}
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const ctx = document.getElementById('expensesChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: [
+                            {% for expense in expenses_by_category %}
+                            '{{ expense.category }}'{{ not loop.last ? ',' : '' }}
+                            {% endfor %}
+                        ],
+                        datasets: [{
+                            data: [
+                                {% for expense in expenses_by_category %}
+                                {{ expense.total }}{{ not loop.last ? ',' : '' }}
+                                {% endfor %}
+                            ],
+                            backgroundColor: [
+                                {% for expense in expenses_by_category %}
+                                '{{ expense.color }}'{{ not loop.last ? ',' : '' }}
+                                {% endfor %}
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            });
+        </script>
+    {% endif %}
+
+{% endblock %}
